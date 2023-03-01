@@ -8,7 +8,7 @@ export default function Navbar({connectedAddress,setAddress}) {
     return (
         <div className='flex justify-between h-12 bg-white text-gray-800 w-full p-2'>
         <div className='flex items-center'>
-            <a href='/' className='font-bold text-xl mx-2'>PoolMyNFT</a>
+            <Link href='/' className='font-bold text-xl mx-2'>PoolMyNFT</Link>
             <Link href='/'>
             <div className='ml-4'>Home</div>
             </Link>

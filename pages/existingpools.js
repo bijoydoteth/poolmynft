@@ -437,7 +437,7 @@ const ExistingPools = ({connectedAddress}) => {
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
         {pool.walletTokens.map((token, index) => (
           <div onClick={()=>handleAddSelected(token.id,'deposit')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-            <img
+            <Image
               src={`${token.thumbnail}`}
               alt={`${pool.collectionName} ${token.id}`}
               className="w-full h-full object-cover rounded-lg"
@@ -454,7 +454,7 @@ const ExistingPools = ({connectedAddress}) => {
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
         {pool.poolTokens.map((token, index) => (
           <div onClick={()=>handleAddSelected(token.id,'withdraw')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-            <img
+            <Image
               src={`${token.thumbnail}`}
               alt={`${pool.collectionName} ${token.id}`}
               className="w-full h-full object-cover rounded-lg"
@@ -469,12 +469,12 @@ const ExistingPools = ({connectedAddress}) => {
     }else if(type==='swap'){
       return (
         <div>
-          {pool.nftTokenWalletBalance>0?<h3>{`${pool.nftTokenWalletBalance} ${pool.collectionName}`} you have</h3>:<h3>You don't have any {`${pool.collectionName}`}</h3>}
+          {pool.nftTokenWalletBalance>0?<h3>{`${pool.nftTokenWalletBalance} ${pool.collectionName}`} you have</h3>:<h3>You don&apos;t have any {`${pool.collectionName}`}</h3>}
           {pool.walletTokens.length>0?
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
             {pool.walletTokens.map((token, index) => (
               <div onClick={()=>handleAddSelected(token.id,'swapOut')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-                <img
+                <Image
                   src={`${token.thumbnail}`}
                   alt={`${pool.collectionName} ${token.id}`}
                   className="w-full h-full object-cover rounded-lg"
@@ -486,14 +486,14 @@ const ExistingPools = ({connectedAddress}) => {
             ))}
           </div>
           :<p>No NFT found in your wallet</p>}
-          {pool.holdingsLength>0?<h3>{`${pool.holdingsLength} ${pool.collectionName}`} in the pool</h3>:<h3>This pool don't have any {`${pool.collectionName}`}</h3>}
+          {pool.holdingsLength>0?<h3>{`${pool.holdingsLength} ${pool.collectionName}`} in the pool</h3>:<h3>This pool don&apos;t have any {`${pool.collectionName}`}</h3>}
           
 
           {(pool.poolTokens.length>0?
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
             {pool.poolTokens.map((token, index) => (
               <div onClick={()=>handleAddSelected(token.id,'swapIn')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-                <img
+                <Image
                   src={`${token.thumbnail}`}
                   alt={`${pool.collectionName} ${token.id}`}
                   className="w-full h-full object-cover rounded-lg"
@@ -552,7 +552,7 @@ const ExistingPools = ({connectedAddress}) => {
         </div>
       </div>:
       <div>
-        <p>You don't have any NFTs in this collection</p>
+        <p>You don&apos;t have any NFTs in this collection</p>
       </div>
         }
     </div>)
@@ -599,7 +599,7 @@ const ExistingPools = ({connectedAddress}) => {
         </div>
       </div>:
       <div>
-        <p>This pool doesn't contain any NFT</p>
+        <p>This pool doesn&apos;t contain any NFT</p>
       </div>
       }
        
@@ -674,7 +674,7 @@ const ExistingPools = ({connectedAddress}) => {
                     <div className="px-8 py-4 flex flex-col items-center sm:flex-row sm:items-start sm:justify-between">
                       <div className="w-full sm:w-auto mb-4 sm:mb-0">
                         <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
-                          <img className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} alt={pool.collectionName} title={`Visit ${pool.collectionName} pool`} width={300} height={300} />
+                          <Image className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} alt={pool.collectionName} title={`Visit ${pool.collectionName} pool`} width={300} height={300} />
                         </a>
                       </div>
                       
