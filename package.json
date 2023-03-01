@@ -1,5 +1,5 @@
 {
-  "name": "nft_pool",
+  "name": "poolmynft",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,6 +22,19 @@
   },
   "devDependencies": {
     "eslint": "8.35.0",
-    "eslint-config-next": "13.2.1"
-  }
+    "eslint-config-next": "13.2.1",
+    "typescript": "^4.9.5"
+  },
+  "description": "In PoolMyNFT, users deposit their NFTs (ERC-721) into collection-specific Pools and receive a standard ERC-20 token for each NFT deposited.",
+  "main": "next.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ho4848/poolmynft.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ho4848/poolmynft/issues"
+  },
+  "homepage": "https://github.com/ho4848/poolmynft#readme"
 }
