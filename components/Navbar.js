@@ -1,6 +1,6 @@
 // create nav bar component with 3 options: home, existing pools, create pools
 import Link from 'next/link';
-import ConnectWalletButton from './connectWalletButton';
+import ConnectWalletButton from './ConnectWalletButton.js';
 
 
 export default function Navbar({connectedAddress,setAddress}) {

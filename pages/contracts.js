@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { getExistingPools } from './existingpools.js';
-import poolContract from './poolContract.json';
+import poolContract from './poolcontract.json';
 
 
 // NFT pool factory address: 0xb67dc4B5A296C3068E8eEc16f02CdaE4c9A255e5

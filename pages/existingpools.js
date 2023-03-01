@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSync } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
-import poolContract from './poolContract.json';
+import poolContract from './poolcontract.json';
 
 
 
