@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import axios from 'axios';
 import { ethers } from 'ethers';
 
 export default async function handler(req, res) {
@@ -29,8 +30,7 @@ export default async function handler(req, res) {
         do {
             let query_url = `${process.env.ALCHEMY_URL}/getNFTs?owner=${walletAddress}&pageSize=100&contractAddresses[]=${nftCollection}&withMetadata=true${pageKey ? `&pageKey=${pageKey}`:''}`
 
-
-            let response = await (await fetch(query_url)).json()
+            const response = (await axios.get(query_url)).data
             let newTokens = response.ownedNfts.map((nft) => {
                 const id = ethers.BigNumber.from(nft.id.tokenId).toString()
                 const thumbnail = nft.media[0].thumbnail

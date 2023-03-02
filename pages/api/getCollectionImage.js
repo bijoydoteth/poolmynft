@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import axios from 'axios';
 
 // Parsing the tokenURI to get the image link
 
@@ -19,19 +20,22 @@ export default async function handler(req, res) {
     }
     try{
       const query_url = `${process.env.ALCHEMY_URL}/getNFTMetadata?contractAddress=${nftCollection}&tokenId=${id}&refreshCache=false`
-      const response = await (await fetch(query_url)).json()
+      const response = (await axios.get(query_url)).data
+
       let imageLink
       if(param.thumbnail){
         imageLink = response.media[0].thumbnail
       }else{
         imageLink = response.media[0].gateway
       }
+      const imageResponse = (await axios.get(imageLink, {
+        responseType: 'arraybuffer'
+      })).data
 
-      const imageResponse = await fetch(imageLink)
-      const imageBuffer = await imageResponse.buffer();
-      res.setHeader('Content-Type', imageResponse.headers.get('Content-Type'));
+      // const imageBuffer = await imageResponse.buffer();
+      res.setHeader('Content-Type', 'text/plain');
       res.status(200);
-      res.send(imageBuffer);
+      res.send(imageResponse);
 
     }catch(err){
         console.log(err);
