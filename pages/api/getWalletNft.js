@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 
 export default async function handler(req, res) {
     const param = req.query
-
     // query format /api/getWalletNft?nftCollection=0xd9b78A2F1dAFc8Bb9c60961790d2beefEBEE56f4&walletAddress=0x13EB216eb78b0048e8E584C77A096ff37eDb7A06
 
     try{
