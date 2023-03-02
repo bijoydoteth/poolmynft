@@ -39,7 +39,8 @@ export default function Home() {
       </main>
 
       <footer className='text-center'>
-        <p> PoolMyNFT by <a href='https://twitter.com/bijoydoteth' target="_blank">bijoy</a></p>
+        <p> Made with ❤️ by <a href='https://twitter.com/bijoydoteth' target="_blank" className='text-blue-500 hover:underline'>bijoy</a> for the community</p>
+        <p>This website is open-sourced. <a href='https://github.com/ho4848/poolmynft' target="_blank" className='text-blue-500 hover:underline'>Source Code</a></p>
       </footer>
       
     </div>

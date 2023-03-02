@@ -18,6 +18,9 @@ export default async function handler(req, res) {
       res.status(400).json({error:'Invalid address'})
       return
     }
+
+    let imageResponse
+
     try{
       const query_url = `${process.env.ALCHEMY_URL}/getNFTMetadata?contractAddress=${nftCollection}&tokenId=${id}&refreshCache=false`
       const response = (await axios.get(query_url)).data
@@ -28,19 +31,21 @@ export default async function handler(req, res) {
       }else{
         imageLink = response.media[0].gateway
       }
-      const imageResponse = (await axios.get(imageLink, {
+      imageResponse = (await axios.get(imageLink, {
         responseType: 'arraybuffer'
       })).data
 
       // const imageBuffer = await imageResponse.buffer();
       res.setHeader('Content-Type', 'text/plain');
-      res.status(200);
-      res.send(imageResponse);
+      
 
     }catch(err){
         console.log(err);
         res.status(400).json({error:err})
     }
+
+    res.status(200);
+    res.send(imageResponse);
     
 }
   
