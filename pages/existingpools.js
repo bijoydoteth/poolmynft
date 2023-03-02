@@ -437,11 +437,15 @@ const ExistingPools = ({connectedAddress}) => {
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
         {pool.walletTokens.map((token, index) => (
           <div onClick={()=>handleAddSelected(token.id,'deposit')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+            <div className='relative'>
             <Image
               src={`${token.thumbnail}`}
               alt={`${pool.collectionName} ${token.id}`}
+              width={200}
+              height={200}
               className="w-full h-full object-cover rounded-lg"
             />
+            </div>
             <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
               <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
             </div>
@@ -454,11 +458,15 @@ const ExistingPools = ({connectedAddress}) => {
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
         {pool.poolTokens.map((token, index) => (
           <div onClick={()=>handleAddSelected(token.id,'withdraw')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+            <div className='relative'>
             <Image
               src={`${token.thumbnail}`}
               alt={`${pool.collectionName} ${token.id}`}
+              width={200}
+              height={200}
               className="w-full h-full object-cover rounded-lg"
             />
+            </div>
             <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
               <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
             </div>
@@ -474,11 +482,15 @@ const ExistingPools = ({connectedAddress}) => {
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
             {pool.walletTokens.map((token, index) => (
               <div onClick={()=>handleAddSelected(token.id,'swapOut')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+                <div className='relative'>
                 <Image
                   src={`${token.thumbnail}`}
                   alt={`${pool.collectionName} ${token.id}`}
+                  width={200}
+                  height={200}
                   className="w-full h-full object-cover rounded-lg"
                 />
+                </div>
                 <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
                   <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
                 </div>
@@ -493,11 +505,15 @@ const ExistingPools = ({connectedAddress}) => {
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
             {pool.poolTokens.map((token, index) => (
               <div onClick={()=>handleAddSelected(token.id,'swapIn')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+                <div className='relative'>
                 <Image
                   src={`${token.thumbnail}`}
                   alt={`${pool.collectionName} ${token.id}`}
+                  width={200}
+                  height={200}
                   className="w-full h-full object-cover rounded-lg"
                 />
+                </div>
                 <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
                   <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
                 </div>
@@ -672,9 +688,17 @@ const ExistingPools = ({connectedAddress}) => {
                 <div key={pool.uuid}> 
                   <div className={`flex flex-col mx-auto w-full shadow-lg rounded-lg my-4 ${userSelected?.id===pool.uuid?'bg-gray-300':'bg-white'}`} >
                     <div className="px-8 py-4 flex flex-col items-center sm:flex-row sm:items-start sm:justify-between">
-                      <div className="w-full sm:w-auto mb-4 sm:mb-0">
+                      <div className="relative w-full sm:w-auto mb-4 sm:mb-0">
                         <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
-                          <Image className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} alt={pool.collectionName} title={`Visit ${pool.collectionName} pool`} width={300} height={300} />
+                          <div className='relative'>
+                          <Image 
+                          className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" 
+                          width={200}
+                          height={200}
+                          src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} 
+                          alt={pool.collectionName} 
+                          title={`Visit ${pool.collectionName} pool`} />
+                          </div>
                         </a>
                       </div>
                       
