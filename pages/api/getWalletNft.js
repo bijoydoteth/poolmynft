@@ -5,18 +5,19 @@ import { ethers } from 'ethers';
 export default async function handler(req, res) {
     const param = req.query
     // query format /api/getWalletNft?nftCollection=0xd9b78A2F1dAFc8Bb9c60961790d2beefEBEE56f4&walletAddress=0x13EB216eb78b0048e8E584C77A096ff37eDb7A06
+    // Check if the address is valid
+    function isValidAddress(address) {
+        return /^(0x)?[0-9a-f]{40}$/i.test(address);
+    }
+
+    const walletAddress = param.walletAddress
+    const nftCollection = param.nftCollection
+    let tokens = []
 
     try{
 
         // const test_param = {nftCollection:'0xd9b78A2F1dAFc8Bb9c60961790d2beefEBEE56f4',walletAddress:'0x13EB216eb78b0048e8E584C77A096ff37eDb7A06'}
 
-        // Check if the address is valid
-        function isValidAddress(address) {
-            return /^(0x)?[0-9a-f]{40}$/i.test(address);
-        }
-
-        const walletAddress = param.walletAddress
-        const nftCollection = param.nftCollection
         if(!isValidAddress(walletAddress)||!isValidAddress(nftCollection)){
             res.status(400).json({error:'Invalid address'})
             return
@@ -24,7 +25,6 @@ export default async function handler(req, res) {
 
         // Print all NFTs returned in the response:
         let pageKey
-        let tokens = []
 
         do {
             let query_url = `${process.env.ALCHEMY_URL}/getNFTs?owner=${walletAddress}&pageSize=100&contractAddresses[]=${nftCollection}&withMetadata=true${pageKey ? `&pageKey=${pageKey}`:''}`
@@ -40,14 +40,13 @@ export default async function handler(req, res) {
           } while (pageKey);
         
         tokens = tokens.flat()
-        res.status(200).json({nftCollection,walletAddress,tokens})
-      
-    
 
     }catch(err){
         console.log(err);
         res.status(400).json({error:err})
     }
+
+    return res.status(200).json({nftCollection,walletAddress,tokens})
     
     
   }

@@ -196,21 +196,30 @@ const ExistingPools = ({connectedAddress}) => {
 
   const handleGetWalletAndPoolBalance = async (nftCollection,walletAddress,poolAddress) => {
     setIsLoading(true)
-    const walletBalance = await getNftBalance(nftCollection,walletAddress);
-    const poolBalance = await getNftBalance(nftCollection,poolAddress);
-    const poolTokenWalletBalance = await getPoolTokenBalance(poolAddress,walletAddress)
+    try{
+      const walletBalance = await getNftBalance(nftCollection,walletAddress);
+      const poolBalance = await getNftBalance(nftCollection,poolAddress);
+      const poolTokenWalletBalance = await getPoolTokenBalance(poolAddress,walletAddress)
 
-    const poolTokens = poolBalance.tokens
-    const walletTokens = walletBalance.tokens
-    setPoolsDetail(prev=>prev.map((pool)=>{
-      if(pool.poolAddress===poolAddress){
-        const newPoolDetail = {...pool,poolTokens,walletTokens,poolTokenWalletBalance,isUpdated:true}
-        return newPoolDetail
-      }
-      return pool
-    }))
-    setIsLoading(false)
-    return {walletBalance,poolBalance}
+      const poolTokens = poolBalance.tokens
+      const walletTokens = walletBalance.tokens
+      setPoolsDetail(prev=>prev.map((pool)=>{
+        if(pool.poolAddress===poolAddress){
+          const newPoolDetail = {...pool,poolTokens,walletTokens,poolTokenWalletBalance,isUpdated:true}
+          return newPoolDetail
+        }
+        return pool
+      }))
+      console.log(poolsDetail);
+      setIsLoading(false)
+      return {walletBalance,poolBalance}
+
+    }catch(err){
+      console.log(err);
+      alert('Something went wrong. Cannot get wallet/pool balance')
+      setIsLoading(false)
+    }
+    
   }
 
 
@@ -432,46 +441,54 @@ const ExistingPools = ({connectedAddress}) => {
       </div>)
     }
 
+    const Wallet_grid = ({pool,type='deposit'})=>{
+      return pool.walletTokens.map((token, index) => (
+        <div onClick={()=>handleAddSelected(token.id,type)} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+          <div className='relative'>
+          <Image
+            src={`${token.thumbnail}`}
+            alt={`${pool.collectionName} ${token.id}`}
+            width={200}
+            height={200}
+            className="w-full h-full object-cover rounded-lg"
+          />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
+            <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
+          </div>
+        </div>
+      ))
+    }
+
+    const Pool_grid = ({pool,type='withdraw'})=>{
+      return pool.poolTokens.map((token, index) => (
+        <div onClick={()=>handleAddSelected(token.id,type)} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
+          <div className='relative'>
+          <Image
+            src={`${token.thumbnail}`}
+            alt={`${pool.collectionName} ${token.id}`}
+            width={200}
+            height={200}
+            className="w-full h-full object-cover rounded-lg"
+          />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
+            <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
+          </div>
+        </div>
+      ))
+    }
+
     if(type==='deposit'){
       return (pool.walletTokens.length>0?
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
-        {pool.walletTokens.map((token, index) => (
-          <div onClick={()=>handleAddSelected(token.id,'deposit')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-            <div className='relative'>
-            <Image
-              src={`${token.thumbnail}`}
-              alt={`${pool.collectionName} ${token.id}`}
-              width={200}
-              height={200}
-              className="w-full h-full object-cover rounded-lg"
-            />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
-              <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
-            </div>
-          </div>
-        ))}
+        <Wallet_grid pool={pool} type='deposit'/>
       </div>
       :<p>No NFT found in your wallet</p>)
     }else if(type==='withdraw'){
       return (pool.poolTokens.length>0?
         <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
-        {pool.poolTokens.map((token, index) => (
-          <div onClick={()=>handleAddSelected(token.id,'withdraw')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-            <div className='relative'>
-            <Image
-              src={`${token.thumbnail}`}
-              alt={`${pool.collectionName} ${token.id}`}
-              width={200}
-              height={200}
-              className="w-full h-full object-cover rounded-lg"
-            />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
-              <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
-            </div>
-          </div>
-        ))}
+        <Pool_grid pool={pool} type='withdraw'/>
       </div>
       :<p>No NFT found in the pool</p>)
     }else if(type==='swap'){
@@ -480,22 +497,7 @@ const ExistingPools = ({connectedAddress}) => {
           {pool.nftTokenWalletBalance>0?<h3>{`${pool.nftTokenWalletBalance} ${pool.collectionName}`} you have</h3>:<h3>You don&apos;t have any {`${pool.collectionName}`}</h3>}
           {pool.walletTokens.length>0?
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
-            {pool.walletTokens.map((token, index) => (
-              <div onClick={()=>handleAddSelected(token.id,'swapOut')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-                <div className='relative'>
-                <Image
-                  src={`${token.thumbnail}`}
-                  alt={`${pool.collectionName} ${token.id}`}
-                  width={200}
-                  height={200}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
-                  <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
-                </div>
-              </div>
-            ))}
+            <Wallet_grid pool={pool} type='swapOut'/>
           </div>
           :<p>No NFT found in your wallet</p>}
           {pool.holdingsLength>0?<h3>{`${pool.holdingsLength} ${pool.collectionName}`} in the pool</h3>:<h3>This pool don&apos;t have any {`${pool.collectionName}`}</h3>}
@@ -503,22 +505,7 @@ const ExistingPools = ({connectedAddress}) => {
 
           {(pool.poolTokens.length>0?
             <div className="my-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[50vh] overflow-y-scroll">
-            {pool.poolTokens.map((token, index) => (
-              <div onClick={()=>handleAddSelected(token.id,'swapIn')} key={`${pool.uuid}-${token.id}`} className={`relative ${hoverEffect}`}>
-                <div className='relative'>
-                <Image
-                  src={`${token.thumbnail}`}
-                  alt={`${pool.collectionName} ${token.id}`}
-                  width={200}
-                  height={200}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-black bg-opacity-50 rounded-b-lg">
-                  <p className="text-white text-sm font-medium">{`${pool.collectionName} #${token.id}`}</p>
-                </div>
-              </div>
-            ))}
+            <Pool_grid pool={pool} type='swapIn'/>
           </div>
           :<p>No NFT found in the pool</p>)}
         </div>
@@ -528,8 +515,7 @@ const ExistingPools = ({connectedAddress}) => {
             
   }
 
-  const DepositInput = (pool)=>{
-    pool = pool.pool
+  const DepositInput = ({pool})=>{
     return (
     <div className="py-2 px-4 bg-gray-200">
       <div className='flex justify-between'>
@@ -539,21 +525,25 @@ const ExistingPools = ({connectedAddress}) => {
       {pool.nftTokenWalletBalance>=0?
       <div>
         <div>
-        {pool.isDepositApproved?
-        <div className="flex flex-row items-center space-x-4">
-          <label> ID:</label>
-          <input type="text" ref={depositInputText} placeholder="Enter NFT ID (use comma to separate multiple IDs)" className="w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500" />
-          <button className={`${buttonStyle}`} onClick={handleInputClear}>Clear</button>
-          <button className={`${buttonStyle}`} onClick={()=>handleDepositNFT(pool)}>Deposit</button>
-        </div>
-        :
-        null
-        }
-
+        
+          <div className="flex flex-row items-center space-x-4">
+            <label> ID:</label>
+            <input 
+            type="text" 
+            ref={depositInputText} 
+            placeholder={pool.isDepositApproved?`Enter NFT ID (use comma to separate multiple IDs)`:'Not yet approve deposit'} 
+            className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 ${pool.isDepositApproved?"bg-white":"bg-gray-500 pointer-events-none"}`} />
+            <button className={`${buttonStyle}`} onClick={handleInputClear}>Clear</button>
+            <button className={`${buttonStyle}`} onClick={()=>handleDepositNFT(pool)}>Deposit</button>
+          </div>
+        
           <div className='flex justify-between my-2'>
+            {isLoading?<FaSync className="animate-spin text-black text-3xl" />:
               <button className={`${buttonStyle} w-2/5`} onClick={()=>handleGetWalletAndPoolBalance(pool.collectionAddress,connectedAddress,pool.poolAddress)}>
-                    {pool.poolTokens.length===0?'Get':'Refresh'} wallet
+              {pool.poolTokens.length===0?'Get':'Refresh'} wallet
               </button>
+            }
+              
             {pool.isDepositApproved?
                 <button className={`${buttonStyle} opacity-30 w-2/5`}>
                   Deposit Approved
@@ -574,8 +564,7 @@ const ExistingPools = ({connectedAddress}) => {
     </div>)
   }
 
-  const WithdrawInput = (pool)=>{
-    pool = pool.pool
+  const WithdrawInput = ({pool})=>{
     return (
     <div className="py-2 px-4 bg-gray-200">
       <div className='flex justify-between'>
@@ -586,21 +575,27 @@ const ExistingPools = ({connectedAddress}) => {
       {pool.holdingsLength>=0?
       <div>
         <div>
-          {pool.poolTokenApproved?
-            <div className="flex flex-row items-center space-x-4">
-              <label> ID:</label>
-              <input type="text" ref={withdrawInputText} placeholder="Enter NFT ID (use comma to separate multiple IDs)" className="w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500" />
-              <button className={`${buttonStyle}`} onClick={handleInputClear}>Clear</button>
-              <button className={`${buttonStyle}`} onClick={()=>handleWithdrawNFT(pool)}>Withdraw</button>
-            </div>
-            :
-            null
-          }
+          
+          <div className="flex flex-row items-center space-x-4">
+            <label> ID:</label>
+            <input 
+            type="text" 
+            ref={withdrawInputText} 
+            placeholder={pool.poolTokenApproved?`Enter NFT ID (use comma to separate multiple IDs)`:'Not yet approve pool token'} 
+            className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 ${pool.poolTokenApproved?"bg-white":"bg-gray-500 pointer-events-none"}`} />
+            <button className={`${buttonStyle}`} onClick={handleInputClear}>Clear</button>
+            <button className={`${buttonStyle}`} onClick={()=>handleWithdrawNFT(pool)}>Withdraw</button>
+          </div>
+            
           
           <div className='flex justify-between my-2'>
-          <button className={`${buttonStyle} w-2/5 my-2`} onClick={()=>handleGetWalletAndPoolBalance(pool.collectionAddress,connectedAddress,pool.poolAddress)}>
-            {pool.poolTokens.length===0?'Get':'Refresh'} {pool.collectionName} pool
-          </button>
+
+            {isLoading?<FaSync className="animate-spin text-black text-3xl" />:
+                <button className={`${buttonStyle} w-2/5 my-2`} onClick={()=>handleGetWalletAndPoolBalance(pool.collectionAddress,connectedAddress,pool.poolAddress)}>
+                {pool.poolTokens.length===0?'Get':'Refresh'} {pool.collectionName} pool
+              </button>
+            }
+          
             {pool.poolTokenApproved?
                 <button className={`${buttonStyle} opacity-30 w-2/5`}>
                   Token Approved
@@ -624,9 +619,7 @@ const ExistingPools = ({connectedAddress}) => {
     </div>)
   }
 
-  const SwapInput = (pool)=>{
-
-    pool = pool.pool
+  const SwapInput = ({pool})=>{
     return (
     <div className="py-2 px-4 bg-gray-200">
        <div className='flex justify-between'>
@@ -635,23 +628,31 @@ const ExistingPools = ({connectedAddress}) => {
         </div>
 
        <div>
-          {pool.isSwapApproved?
+          
           <div className="flex flex-row items-center space-x-4 my-5">
             <label> Out:</label>
-            <input type="text" ref={swapOutInputText} placeholder="Enter the ID you wish to send out" className="w-1/3 px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500" />
+            <input 
+            type="text" 
+            ref={swapOutInputText}
+            placeholder={pool.isSwapApproved?"Enter the ID you wish to send out":'Not yet approve swap'} 
+            className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 ${pool.isSwapApproved?"bg-white":"bg-gray-500 pointer-events-none"}`} />
             <label> In:</label>
-            <input type="text" ref={swapInInputText} placeholder="Enter the ID you wish to receive" className="w-1/3 px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500" />
+            <input 
+            type="text" 
+            ref={swapInInputText} 
+            placeholder={pool.isSwapApproved?"Enter the ID you wish to send out":'Not yet approve swap'} 
+            className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-400 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 ${pool.isSwapApproved?"bg-white":"bg-gray-500 pointer-events-none"}`} />
             <button className={`${buttonStyle}`} onClick={handleInputClear}>Clear</button>
             <button className={`${buttonStyle}`} onClick={()=>handleSwapNFT(pool)}>Swap</button>
           </div>
-          :
-          null}
-          
           
           <div className='flex justify-between my-2'>
-            <button className={`${buttonStyle} w-2/5`} onClick={()=>handleGetWalletAndPoolBalance(pool.collectionAddress,connectedAddress,pool.poolAddress)}>
+            {isLoading?<FaSync className="animate-spin text-black text-3xl" />:
+              <button className={`${buttonStyle} w-2/5`} onClick={()=>handleGetWalletAndPoolBalance(pool.collectionAddress, connectedAddress,pool.poolAddress)}>
                 {pool.poolTokens.length===0?'Get':'Refresh'} {pool.collectionName} pool
-            </button>
+              </button>
+            }
+            
             {pool.isSwapApproved?
                 <button className={`${buttonStyle} opacity-30 w-2/5`}>
                   Swap Approved
@@ -723,8 +724,8 @@ const ExistingPools = ({connectedAddress}) => {
                     {userSelected?.id===pool.uuid?
                       <div className=''>
                         <div className="px-8 py-4 flex my-2 justify-between">
-                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleDepositSection(pool)}> Deposit </button>
-                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleWithdrawSection(pool)}> Withdraw </button>
+                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleDepositSection(pool)}> Deposit (Wallet: {pool.nftTokenWalletBalance}) </button>
+                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleWithdrawSection(pool)}> Withdraw (Pool: {pool.holdingsLength}) </button>
                           <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleSwapSection(pool)}> Swap </button>
                         </div>
                         {(userSelected?.depositClicked)?<DepositInput pool={pool} />:null}
