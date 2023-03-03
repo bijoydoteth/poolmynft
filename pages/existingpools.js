@@ -210,7 +210,7 @@ const ExistingPools = ({connectedAddress}) => {
         }
         return pool
       }))
-      console.log(poolsDetail);
+      // console.log(poolsDetail);
       setIsLoading(false)
       return {walletBalance,poolBalance}
 
@@ -226,6 +226,10 @@ const ExistingPools = ({connectedAddress}) => {
   const handleSelectPool = (pool) => {
     setUserSelected({id:pool.uuid,activePool:pool.poolAddress});
   };
+
+  const handleGoBackPools = () => {
+    setUserSelected(null)
+  }
 
   const handleDepositSection = (pool) => {
     setUserSelected({id:pool.uuid,activePool:pool.poolAddress,depositClicked:true})
@@ -669,6 +673,67 @@ const ExistingPools = ({connectedAddress}) => {
     </div>)
   }
 
+  const RenderPools = ({poolsDetail}) => {
+    return poolsDetail.map((pool) => {
+      return (
+        <div key={pool.uuid}> 
+          <div className={`flex flex-col mx-auto w-full shadow-lg rounded-lg my-4 ${userSelected?.id===pool.uuid?'bg-gray-300':'bg-white'}`} >
+            <div className="px-8 py-4 flex flex-col items-center sm:flex-row sm:items-start sm:justify-between">
+              <div className="relative w-full sm:w-auto mb-4 sm:mb-0">
+                <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
+                  <div className='relative'>
+                  <Image 
+                  className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" 
+                  width={200}
+                  height={200}
+                  src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} 
+                  alt={pool.collectionName} 
+                  title={`Visit ${pool.collectionName} pool`} />
+                  </div>
+                </a>
+              </div>
+              
+              <div className="text-center sm:text-left sm:pl-4">
+                <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
+                  <h1 className="text-2xl font-bold text-gray-800 hover:text-blue-500">{pool.name} </h1>
+                </a>
+                <div className="flex flex-col items-center sm:flex-row sm:justify-start mt-2">
+                  <a href={`https://opensea.io/assets?search[query]=${pool.collectionAddress}`} target="_blank" rel="noopener noreferrer" className="mr-0 sm:mr-4">
+                    <p className="text-md font-bold text-gray-500 hover:text-blue-500">Collection: {pool.collectionName}</p>
+                  </a>
+                </div>
+              </div>        
+
+              <div>
+                <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Opensea </a>
+                <a href={`https://info.uniswap.org/#/tokens/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="mx-1 text-gray-500 hover:text-blue-500"> Uniswap </a>
+                <a href={`https://etherscan.io/address/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Etherscan </a>
+              </div>  
+            </div>
+
+            {userSelected?.id===pool.uuid?
+              <div className=''>
+                <div className="px-8 py-4 flex my-2 justify-between">
+                  <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleDepositSection(pool)}> Deposit (Wallet: {pool.nftTokenWalletBalance}) </button>
+                  <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleWithdrawSection(pool)}> Withdraw (Pool: {pool.holdingsLength}) </button>
+                  <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleSwapSection(pool)}> Swap </button>
+                </div>
+                {(userSelected?.depositClicked)?<DepositInput pool={pool} />:null}
+                {(userSelected?.withdrawClicked)?<WithdrawInput pool={pool}/>:null}
+                {(userSelected?.swapClicked)?<SwapInput pool={pool}/>:null}
+              </div>
+              :
+              <div className="text-center m-4">
+                  <button onClick={()=>handleSelectPool(pool,{id:pool.uuid})} className="right-0 top-0 w-full h-full px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-black focus:outline-none"> Select Pool (Pool Balance: {pool.holdingsLength})</button>
+              </div>
+              
+              }
+              
+          </div>
+        </div>
+      )
+    })
+  }
   
   
   
@@ -683,66 +748,16 @@ const ExistingPools = ({connectedAddress}) => {
             <button onClick={handleGetExistingPools} className='right-0 top-0 h-full px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-black focus:outline-none'>{poolsDetail?.length>0?`Total pools: ${poolsDetail?.length} (Click to reload)`:'Get existing pools'}</button>
             }
           </div>
+          <div>
+            {userSelected?.activePool?<button className='underline' onClick={handleGoBackPools}> ← Back </button>:<div className='underline'>Existing Collections ↓</div>}
+          </div>
           <div className='overflow-y-scroll py-2 max-h-[85vh]'>
-            {poolsDetail?.length>0 ? poolsDetail.map((pool) => {
-              return (
-                <div key={pool.uuid}> 
-                  <div className={`flex flex-col mx-auto w-full shadow-lg rounded-lg my-4 ${userSelected?.id===pool.uuid?'bg-gray-300':'bg-white'}`} >
-                    <div className="px-8 py-4 flex flex-col items-center sm:flex-row sm:items-start sm:justify-between">
-                      <div className="relative w-full sm:w-auto mb-4 sm:mb-0">
-                        <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
-                          <div className='relative'>
-                          <Image 
-                          className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" 
-                          width={200}
-                          height={200}
-                          src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} 
-                          alt={pool.collectionName} 
-                          title={`Visit ${pool.collectionName} pool`} />
-                          </div>
-                        </a>
-                      </div>
-                      
-                      <div className="text-center sm:text-left sm:pl-4">
-                        <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
-                          <h1 className="text-2xl font-bold text-gray-800 hover:text-blue-500">{pool.name} </h1>
-                        </a>
-                        <div className="flex flex-col items-center sm:flex-row sm:justify-start mt-2">
-                          <a href={`https://opensea.io/assets?search[query]=${pool.collectionAddress}`} target="_blank" rel="noopener noreferrer" className="mr-0 sm:mr-4">
-                            <p className="text-md font-bold text-gray-500 hover:text-blue-500">Collection: {pool.collectionName}</p>
-                          </a>
-                        </div>
-                      </div>        
-
-                      <div>
-                        <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Opensea </a>
-                        <a href={`https://info.uniswap.org/#/tokens/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="mx-1 text-gray-500 hover:text-blue-500"> Uniswap </a>
-                        <a href={`https://etherscan.io/address/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Etherscan </a>
-                      </div>  
-                    </div>
-
-                    {userSelected?.id===pool.uuid?
-                      <div className=''>
-                        <div className="px-8 py-4 flex my-2 justify-between">
-                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleDepositSection(pool)}> Deposit (Wallet: {pool.nftTokenWalletBalance}) </button>
-                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleWithdrawSection(pool)}> Withdraw (Pool: {pool.holdingsLength}) </button>
-                          <button className={`${buttonStyle} w-1/4 h-full`} onClick={()=>handleSwapSection(pool)}> Swap </button>
-                        </div>
-                        {(userSelected?.depositClicked)?<DepositInput pool={pool} />:null}
-                        {(userSelected?.withdrawClicked)?<WithdrawInput pool={pool}/>:null}
-                        {(userSelected?.swapClicked)?<SwapInput pool={pool}/>:null}
-                      </div>
-                      :
-                      <div className="text-center m-4">
-                          <button onClick={()=>handleSelectPool(pool,{id:pool.uuid})} className="right-0 top-0 w-full h-full px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-black focus:outline-none"> Select Pool (Pool Balance: {pool.holdingsLength})</button>
-                      </div>
-                      
-                      }
-                      
-                  </div>
-                </div>
-              )
-            }):
+            {poolsDetail?.length>0 ? 
+            userSelected?.activePool?
+            <RenderPools poolsDetail={poolsDetail.filter(pool=>pool.poolAddress===userSelected.activePool)} />
+            :
+            <RenderPools poolsDetail={poolsDetail} />
+            :
             <div>Click get existing pools to check all available pools</div>
             }
           </div>
