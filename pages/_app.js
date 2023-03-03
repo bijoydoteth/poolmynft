@@ -8,8 +8,7 @@ function MyApp({ Component, pageProps }) {
   const [connectedAddress, setAddress] = useState(null);
 
   useEffect(() => {
-    const savedAddress = JSON.parse(localStorage.getItem('connectedAddress'));
-    if (savedAddress) setAddress(savedAddress);
+    
   }, []);
 
   // Store connectedAddress in local storage with useEffect
