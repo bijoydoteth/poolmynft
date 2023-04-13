@@ -13,7 +13,7 @@ const nextConfig = {
       },
     ],
   },
-  unoptimized: true,
+  // unoptimized: true,
 }
 
 module.exports = nextConfig
