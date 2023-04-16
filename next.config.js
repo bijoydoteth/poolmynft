@@ -6,11 +6,23 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        // You can add these as well
-        // port: '',
-        // pathname: 'arifscloud/image/upload/**',
-      },
+        hostname: '*',
+      }
+      // {
+      //   protocol: 'https',
+      //   hostname: 'res.cloudinary.com',
+      //   // You can add these as well
+      //   // port: '',
+      //   // pathname: 'arifscloud/image/upload/**',
+      // },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'i.seadn.io',
+      // },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'lh3.googleusercontent.com',
+      // }
     ],
   },
   // unoptimized: true,

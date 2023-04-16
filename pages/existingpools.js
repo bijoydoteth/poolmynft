@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   ContractCallContext, ContractCallResults, Multicall
 } from 'ethereum-multicall';
@@ -55,7 +56,12 @@ const ExistingPools = ({connectedAddress}) => {
   const hoverEffect = 'hover:transform hover:-translate-y-2 transition duration-300 hover:opacity-80 hover:cursor-pointer'
 
   useEffect(() => {
-    const poolsDetail = JSON.parse(localStorage.getItem('poolsDetail'));
+    const localStorageItem = localStorage.getItem('poolsDetail')
+    if(localStorageItem==='undefined') {
+      localStorage.removeItem('poolsDetail')
+      return
+    }
+    const poolsDetail = JSON.parse(localStorageItem);
     if (poolsDetail) setPoolsDetail(poolsDetail);   
   }, []);
 
@@ -88,7 +94,8 @@ const ExistingPools = ({connectedAddress}) => {
 
     try {
       const callResults = (await multicall.call(contractCallContext)).results;
-      const poolDetail = (Object.keys(callResults).map((key) => callResults[key])).map(e => {
+      
+      let poolDetail = (Object.keys(callResults).map((key) => callResults[key])).map(e => {
         const poolTokenDecimals = (ethers.BigNumber.from(e.callsReturnContext[5].returnValues[0]))
         const poolTokenWalletBalance = ethers.utils.formatUnits((ethers.BigNumber.from(e.callsReturnContext[4].returnValues[0].hex)).toString(),poolTokenDecimals)
         const poolTokenApproved = ethers.utils.formatUnits((ethers.BigNumber.from(e.callsReturnContext[6].returnValues[0].hex)).toString(),poolTokenDecimals)>1
@@ -104,6 +111,16 @@ const ExistingPools = ({connectedAddress}) => {
           poolTokenApproved,
           poolTokens:[],
           walletTokens:[],
+        }
+      })
+
+      const image_query_url = `https://api.reservoir.tools/collections/v5?${poolDetail.map(pool=>`contract=${pool.collectionAddress}`).join('&')}`
+      const sampleImages = (await axios.get(image_query_url)).data.collections.map(e=>{return{collectionAddress:e.primaryContract,sampleImage:e.sampleImages[0]}})
+      
+      poolDetail = poolDetail.map((pool) => {
+        return {
+          ...pool,
+          sampleImage: sampleImages.filter(e=>e.collectionAddress===(pool.collectionAddress).toLowerCase())[0].sampleImage
         }
       })
 
@@ -686,29 +703,42 @@ const ExistingPools = ({connectedAddress}) => {
                   className="w-24 h-24 rounded-lg object-cover mx-auto sm:mx-0" 
                   width={200}
                   height={200}
-                  src={`/api/getCollectionImage?nftCollection=${pool.collectionAddress}&id=1&thumbnail=true`} 
+                  src={`${pool.sampleImage?pool.sampleImage:'https://via.placeholder.com/200'}`} 
                   alt={pool.collectionName} 
                   title={`Visit ${pool.collectionName} pool`} />
                   </div>
                 </a>
               </div>
-              
-              <div className="text-center sm:text-left sm:pl-4">
-                <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
-                  <h1 className="text-2xl font-bold text-gray-800 hover:text-blue-500">{pool.name} </h1>
-                </a>
-                <div className="flex flex-col items-center sm:flex-row sm:justify-start mt-2">
-                  <a href={`https://opensea.io/assets?search[query]=${pool.collectionAddress}`} target="_blank" rel="noopener noreferrer" className="mr-0 sm:mr-4">
-                    <p className="text-md font-bold text-gray-500 hover:text-blue-500">Collection: {pool.collectionName}</p>
-                  </a>
-                </div>
-              </div>        
 
-              <div>
-                <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Opensea </a>
-                <a href={`https://info.uniswap.org/#/tokens/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="mx-1 text-gray-500 hover:text-blue-500"> Uniswap </a>
-                <a href={`https://etherscan.io/address/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Etherscan </a>
-              </div>  
+              <div className='flex-grow'>
+                <div className='flex justify-between'>
+                  <div className="text-center sm:text-left sm:pl-4">
+                    <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer">
+                      <h1 className="text-2xl font-bold text-gray-800 hover:text-blue-500">{pool.name} </h1>
+                    </a>
+                    {/* <div className="flex flex-col items-center sm:flex-row sm:justify-start mt-2">
+                      <a href={`https://opensea.io/assets?search[query]=${pool.collectionAddress}`} target="_blank" rel="noopener noreferrer" className="mr-0 sm:mr-4">
+                        <p className="text-md font-bold text-gray-500 hover:text-blue-500">Collection: {pool.collectionName}</p>
+                      </a>
+                    </div> */}
+                  </div>        
+
+                  <div className=''>
+                    <a href={`https://opensea.io/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Opensea </a>
+                    <a href={`https://info.uniswap.org/#/tokens/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="mx-1 text-gray-500 hover:text-blue-500"> Uniswap </a>
+                    <a href={`https://etherscan.io/address/${pool.poolAddress}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500"> Etherscan </a>
+                  </div>
+                </div>
+
+                {userSelected?.id===pool.uuid?null:
+                  <div className="text-center m-4">
+                      <button onClick={()=>handleSelectPool(pool,{id:pool.uuid})} className="right-0 top-0 w-full h-full px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-black focus:outline-none"> Select Pool (Pool Balance: {pool.holdingsLength})</button>
+                  </div>
+                }
+                
+
+              </div>
+
             </div>
 
             {userSelected?.id===pool.uuid?
@@ -723,11 +753,8 @@ const ExistingPools = ({connectedAddress}) => {
                 {(userSelected?.swapClicked)?<SwapInput pool={pool}/>:null}
               </div>
               :
-              <div className="text-center m-4">
-                  <button onClick={()=>handleSelectPool(pool,{id:pool.uuid})} className="right-0 top-0 w-full h-full px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-black focus:outline-none"> Select Pool (Pool Balance: {pool.holdingsLength})</button>
-              </div>
-              
-              }
+              null
+            }
               
           </div>
         </div>
